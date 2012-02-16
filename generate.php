@@ -66,12 +66,17 @@ body{
     padding: 30px;
 }
 
+img {
+   padding:2px;
+   border:1px solid #ccc;
+   background-color:#fff;
+}
+
 .permalink { 
 	font-style: normal;
 	text-decoration: none;
 	color: #888888;
     font-size: 14px;
-    margin: 10px;
 }
 
 .hr {
@@ -81,6 +86,7 @@ body{
     clear:both; 
     height:0; 
     width: 100%;
+     margin-top: -10px;
 }
         
 h1, h2, h3, h4 {
@@ -196,9 +202,12 @@ function count_words($string)
 
 $files = array_reverse(glob('raw/*.txt'));
 
+$counter = 0;
 $i = count($files);
 
 foreach($files as $file) {
+	
+	
 	
 	$urlname = urlconvert(substr($file,4,-3));
 	include_once "markdown.php";
@@ -206,14 +215,26 @@ foreach($files as $file) {
 	$wc = count_words($html);
 	$title = str_replace($i.'-','',substr($file,4,-4));
 	$date = date("M d, Y", filemtime($file));
-	$article = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	$article = '
 <html>
 <head>
 <title>'.$title.'</title>
 '.$stylesheet_article.'
 </head>
-<body><h1>'.$title.'<a class="permalink" href="'.$website.$urlname.'">'.$date.' | &#8734;</a></h1><div class="hr"></div>'.$html.'</body>
+<body><h1>'.$title.'<a class="permalink" href="'.$website.$urlname.'"><br>'.$date.' | &#8734;</a></h1><div class="hr"></div>'.$html.'</body>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(["_setAccount", "UA-22837274-4"]);
+  _gaq.push(["_trackPageview"]);
+
+  (function() {
+    var ga = document.createElement("script"); ga.type = "text/javascript"; ga.async = true;
+    ga.src = ("https:?" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+    var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 </html>';
 	file_put_contents($urlname, $article);
 	
@@ -223,7 +244,18 @@ foreach($files as $file) {
 	
 	$i--;
 	
+	if ($counter<10) {
+	$rss_items .= '<item><title>'.$title.'</title><description>'.htmlspecialchars($html).'</description><pubDate>'.date("Y-m-d H:i", filemtime($file)).'</pubDate><link>'.$website.$urlname.'</link></item>';
+	$counter++;
+	} else {
+	}
 }
+
+$feed = '<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0"><channel><title>Thoughts and Notes (http://restfulpanda.com)</title>
+<description>Authored by Maximilian Mackh. Full content RSS feed. Let me know if you have any suggestions.</description>
+<link>http://restfulpanda.com</link>'.$rss_items.'</channel></rss>'; 
+file_put_contents('feed.xml', $feed);
 
 $result = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -232,15 +264,20 @@ $result = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 '.$stylesheet.'
 </head>
 <body>
+<a href="http://github.com/inoads/p-body"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/71eeaab9d563c2b3c590319b398dd35683265e85/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub"></a>
 <h1>'.$blog_name.'</h1>
 '.$index.'
 <br>
 <br>
 <br>
 <center>
-<a href="http://www.twitter.com/'.$twitter.'"> 
+<a href="http://www.twitter.com/'.$twitter.'">
 <img src="images/twitter.png" alt="twitter"/>
 </a>
+<br>
+<br>
+<a href="feed.xml">RSS</a>
+</center>
 </body>
 </html>';
 
