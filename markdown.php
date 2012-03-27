@@ -1,4 +1,4 @@
-<?php
+<?php /**/?><?php
 #
 # Markdown  -  A text-to-HTML conversion tool for web writers
 #

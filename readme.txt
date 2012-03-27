@@ -14,3 +14,5 @@ Thus: [number]-[Title].txt
 Fill yout all the variables in the top section of generate.php (author, twitter, website)
 
 All finished? Navigate to http://yourserver.com/generate.php!
+
+Demo: http://restfulpanda.com
